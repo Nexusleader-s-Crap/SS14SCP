@@ -188,6 +188,30 @@
         },
         {
             "name": "Admin"
+        },
+        {
+            "name": "EntranceTrainee"
+        },
+        {
+            "name": "EntranceOfficer"
+        },
+        {
+            "name": "EntranceWarden"
+        },
+        {
+            "name": "LightTrainee"
+        },
+        {
+            "name": "LightOfficer"
+        },
+        {
+            "name": "LightWarden"
+        },
+        {
+            "name": "ContainmentOfficer"
+        },
+        {
+            "name": "ContainmentOverseer"
         }
     ]
 }
