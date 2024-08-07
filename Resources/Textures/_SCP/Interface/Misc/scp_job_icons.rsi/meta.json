@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Original",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "ContainmentOfficer"
+    },
+    {
+      "name": "ContainmentOverseer"
+    },
+    {
+      "name": "EntranceOfficer"
+    },
+    {
+      "name": "EntranceTrainee"
+    },
+    {
+      "name": "EntranceWarden"
+    },
+    {
+      "name": "LightOfficer"
+    },
+    {
+      "name": "LightTrainee"
+    },
+    {
+      "name": "LightWarden"
+    }
+  ]
+}
