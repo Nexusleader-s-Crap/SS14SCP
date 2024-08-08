@@ -2,12 +2,12 @@
 - type: entity
   id: LockerCentCom
   parent: LockerBaseSecure
-  name: secure closet
+  name: centcom's locker
   components:
   - type: Appearance
   - type: EntityStorageVisuals
-    stateBaseClosed: secure
-    stateDoorOpen: secure_open
-    stateDoorClosed: secure_door
+    stateBaseClosed: centcom
+    stateDoorOpen: centcom_open
+    stateDoorClosed: centcom_door
   - type: AccessReader
     access: [["CentralCommand"]]
