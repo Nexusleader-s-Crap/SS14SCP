@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "None",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "centcom"
+    },
+    {
+      "name": "centcom_door"
+    },
+    {
+      "name": "centcom_open"
+    }
+  ]
+}
