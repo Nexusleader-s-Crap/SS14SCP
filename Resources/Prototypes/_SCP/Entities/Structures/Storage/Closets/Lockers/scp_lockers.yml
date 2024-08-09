@@ -1,13 +1,37 @@
-# CentCom
 - type: entity
-  id: LockerCentCom
-  parent: LockerBaseSecure
+  parent: ClosetBase
+  id: TFDLockerBase
+  name: secure locker
+  description: It's an immobile card-locked storage unit.
+  components:
+  - type: Sprite
+    sprite: _SCP/Structures/Storage/Lockers/base.rsi
+    layers:
+    - state: base
+      map: ["enum.StorageVisualLayers.Base"]
+    - state: closed
+      map: ["enum.StorageVisualLayers.Door"]
+    - state: locked
+      map: ["enum.LockVisualLayers.Lock"]
+      shader: unshaded
+    - state: welded
+      visible: false
+      map: ["enum.WeldableLayers.BaseWelded"]
+  - type: Appearance
+  - type: LockVisuals
+  - type: EntityStorageVisuals
+    stateBaseClosed: base
+    stateDoorOpen: opened
+    stateDoorClosed: closed
+  - type: AccessReader
+  - type: Lock
+
+- type: entity
+  id: TFDLockerCentCom
+  parent: TFDLockerBase
   name: centcom's locker
   components:
-  - type: Appearance
-  - type: EntityStorageVisuals
-    stateBaseClosed: centcom
-    stateDoorOpen: centcom_open
-    stateDoorClosed: centcom_door
+  - type: Sprite
+    sprite: _SCP/Structures/Storage/Lockers/centcom.rsi
   - type: AccessReader
     access: [["CentralCommand"]]
