@@ -16,9 +16,6 @@ public sealed partial class PocketDimensionSenderComponent : Component
     [AutoNetworkedField]
     public bool inPocketDimension = false;
 
-    [AutoNetworkedField]
-    public bool traversing = false;
-
     [DataField]
     public EntProtoId traversePocketAction = "ActionTraversePocketDimension";
 }

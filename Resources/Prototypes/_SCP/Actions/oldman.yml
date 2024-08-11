@@ -10,3 +10,4 @@
       state: state-laws
     event: !type:TogglePocketDimension
     useDelay: 2
+  - type: TraversePocketDimensionAction

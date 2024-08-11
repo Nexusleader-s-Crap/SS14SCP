@@ -6,3 +6,5 @@ public sealed partial class TogglePocketDimension : InstantActionEvent { }
 
 [Serializable,NetSerializable]
 public sealed partial class TogglePocketDimensionDoAfter : SimpleDoAfterEvent { }
+
+public sealed partial class OldManSpawn : EventArgs { }

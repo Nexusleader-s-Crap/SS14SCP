@@ -4,11 +4,10 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Content.Shared.Weapons.Melee.Events;
-using Content.Shared.Actions;
+using Content.Shared._SCP.Scps.Oldman;
 using Content.Shared.Humanoid;
 using System.Numerics;
-using Content.Shared.Coordinates;
-using Content.Shared.Movement.Components;
+using Content.Shared.Actions;
 
 namespace Content.Server._SCP.Scps.oldman;
 
@@ -20,6 +19,7 @@ public sealed class PocketDimensionSystem : EntitySystem
     [Dependency] private readonly MetaDataSystem _metaDataSystem = default!;
     [Dependency] private readonly SharedTransformSystem _xformSystem = default!;
     [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly SharedOldManSystem _oldMan = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
     private ISawmill _sawmill = default!;
@@ -33,7 +33,7 @@ public sealed class PocketDimensionSystem : EntitySystem
 
         SubscribeLocalEvent<PocketDimensionSenderComponent, MeleeHitEvent>(OnSend);
 
-        SubscribeLocalEvent<PocketDimensionSenderComponent, ComponentStartup>(OnStartup);
+        SubscribeLocalEvent<PocketDimensionSenderComponent, OldManSpawn>(OnStartup);
         SubscribeLocalEvent<PocketDimensionSenderComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<PocketDimensionSenderComponent, TogglePocketDimensionDoAfter>(OnTogglePocketDimeison);
     }
@@ -52,35 +52,35 @@ public sealed class PocketDimensionSystem : EntitySystem
 
     private void OnTogglePocketDimeison(EntityUid owner, PocketDimensionSenderComponent comp, TogglePocketDimensionDoAfter args)
     {
-
-        if (!comp.traversing)
+        if (!_oldMan.GetTraverseComponent(owner, out var traverse))
             return;
-
-        comp.traversing = false;
-
         if (args.Cancelled)
+        {
+            _actions.SetCooldown(traverse.actionId, traverse.cooldownFail);
             return;
+        }
 
         if (comp.pocketDimensionGrid == null)
             return;
 
-        if(comp.inPocketDimension)
+        _actions.SetCooldown(traverse.actionId, traverse.cooldownSuccess);
+
+        if (comp.inPocketDimension)
         { 
             _xformSystem.SetCoordinates(owner, comp.lastLocation);
         }
         else
         {
-            if (!TryComp<MobMoverComponent>(owner, out var mover))
+            if (!TryComp<TransformComponent>(owner, out var mover))
                 return;
-            comp.lastLocation = mover.LastPosition;
+            comp.lastLocation = mover.Coordinates;
             _xformSystem.SetCoordinates(owner, new EntityCoordinates(comp.pocketDimensionGrid.Value, Vector2.Zero));
         }
         comp.inPocketDimension = !comp.inPocketDimension;
     }
 
-    private void OnStartup(EntityUid owner, PocketDimensionSenderComponent comp, ComponentStartup args)
+    private void OnStartup(EntityUid owner, PocketDimensionSenderComponent comp, OldManSpawn args)
     {
-        _actions.AddAction(owner, comp.traversePocketAction);
         if (comp.pocketDimensionGrid == null)
         {
             var map = _mapManager.GetMapEntityId(_mapManager.CreateMap());
