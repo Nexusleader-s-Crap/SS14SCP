@@ -120,18 +120,23 @@ public sealed class SharedOldManSystem : EntitySystem
             {
                 if (!TryComp<PocketDimensionSenderComponent>(person.dimensionOwner, out var _))
                     continue;
+                if (!_prototypeManager.TryIndex(person.damageProto, out var damageType))
+                    continue;
+
+                var downer = Comp<MeleeWeaponComponent>(person.dimensionOwner);
+
+                DamageSpecifier damages = new DamageSpecifier(damageType, person.damageOverTime);
+                _damage.TryChangeDamage(uid, downer.Damage);
+
+                _color.RaiseEffect(Color.Red, new List<EntityUid>() { uid }, Filter.Pvs(uid, entityManager: EntityManager));
+
+                person.lastDamaged = _timing.CurTime;
+
                 if (!_mind.TryGetMind(uid, out var _, out var mind))
                     continue;
                 if (mind.Session == null)
                     continue;
-                if (!_prototypeManager.TryIndex(person.damageProto, out var damageType))
-                    continue;
                 _audio.PlayGlobal(person.HitNoise, mind.Session);
-                var downer = Comp<MeleeWeaponComponent>(person.dimensionOwner);
-                DamageSpecifier damages = new DamageSpecifier(damageType, person.damageOverTime);
-                _damage.TryChangeDamage(uid, downer.Damage);
-                _color.RaiseEffect(Color.Red, new List<EntityUid>() { uid }, Filter.Pvs(uid, entityManager: EntityManager));
-                person.lastDamaged = _timing.CurTime;
             }
         }
     }
