@@ -1,0 +1,27 @@
+- type: entity
+  parent: TFDPlayableSCP
+  id: TFDSCP106
+  name: SCP-106
+  description: scp 106
+  components:
+  - type: MovementSpeedModifier
+    baseWalkSpeed : 1.5
+    baseSprintSpeed : 3.5
+  - type: MeleeWeapon
+    soundHit:
+      collection: OldmanHit
+    damage:
+      groups:
+        Burn: 20 
+  - type: Tag
+    tags:
+      - FootstepSound
+  - type: FootstepModifier
+    footstepSoundCollection:
+      collection: OldmanHit
+  - type: PocketDimensionSender
+  - type: Sprite
+    sprite: _SCP/Mobs/Scps/oldman.rsi
+    layers:
+    - map: ["enum.DamageStateVisualLayers.Base"]
+      state: alive

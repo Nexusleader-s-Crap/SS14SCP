@@ -1,0 +1,6 @@
+- type: statusIcon
+  parent: JobIcon
+  id: TFDJobIconSCP
+  icon:
+    sprite: /Textures/_SCP/Interface/scp_job_icons.rsi
+    state: SCP #Placeholder
