@@ -13,6 +13,17 @@
     damage:
       groups:
         Burn: 20 
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.3
+        density: 230
+        mask:
+        - SmallMobMask
+        layer:
+        - SmallMobLayer
   - type: Tag
     tags:
       - FootstepSound
@@ -25,3 +36,27 @@
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: alive
+
+- type: entity
+  parent: [ TFDSCP106 ]
+  id: TFDSCP106AI
+  name: SCP-106 (AI)
+  components:
+  - type: HTN
+    rootTask:
+      task: SimpleHostileCompound
+    blackboard:
+      NavClimb: !type:Bool
+        true
+      NavSmash: !type:Bool
+        true
+  - type: NpcFactionMember
+    factions:
+    - SimpleHostile
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - FootstepSound
+  - type: MovementAlwaysTouching
+  - type: ReplacementAccent
+    accent: genericAggressive

@@ -1,0 +1,5 @@
+- type: alert
+  id: PocketDimension
+  icons: [ /Textures/_SCP/Effects/oldmanpuddle.rsi/puddle.png ]
+  name: scp-oldman-alert-pocketdimension-name
+  description: scp-oldman-alert-pocketdimension-desc

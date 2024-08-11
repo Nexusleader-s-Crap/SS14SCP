@@ -8,6 +8,10 @@ using Content.Shared._SCP.Scps.Oldman;
 using Content.Shared.Humanoid;
 using System.Numerics;
 using Content.Shared.Actions;
+using Robust.Shared.Audio.Systems;
+using Content.Shared.Mind;
+using Content.Shared.Coordinates;
+using Content.Shared.Mobs;
 
 namespace Content.Server._SCP.Scps.oldman;
 
@@ -21,6 +25,8 @@ public sealed class PocketDimensionSystem : EntitySystem
     [Dependency] private readonly ILogManager _logManager = default!;
     [Dependency] private readonly SharedOldManSystem _oldMan = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SharedMindSystem _mind = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -36,43 +42,78 @@ public sealed class PocketDimensionSystem : EntitySystem
         SubscribeLocalEvent<PocketDimensionSenderComponent, OldManSpawn>(OnStartup);
         SubscribeLocalEvent<PocketDimensionSenderComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<PocketDimensionSenderComponent, TogglePocketDimensionDoAfter>(OnTogglePocketDimeison);
+        SubscribeLocalEvent<PocketDimensionDwellerComponent, MobStateChangedEvent>(OnStateChange);
     }
 
+    public void OnStateChange(EntityUid owner, PocketDimensionDwellerComponent comp, MobStateChangedEvent args)
+    {
+        if (!TryComp<TransformComponent>(owner, out var transform))
+            return;
+        if (args.NewMobState == MobState.Critical)
+        {
+            if (!TryComp<PocketDimensionSenderComponent>(comp.dimensionOwner, out var dimowner))
+                return;
+            _audio.PlayPvs(dimowner.puddleSound, transform.Coordinates);
+            QueueDel(owner);
+        }
+    }
     private void OnSend(EntityUid owner, PocketDimensionSenderComponent comp, MeleeHitEvent args)
     {
         if (comp.pocketDimensionGrid == null)
             return;
         foreach (var entity in args.HitEntities)
         {
-            if (!TryComp<HumanoidAppearanceComponent>(entity, out var person))
+            if (HasComp<PocketDimensionDwellerComponent>(entity))
                 return;
+            if (!TryComp<HumanoidAppearanceComponent>(entity, out var person)) //Better check for a player
+                return;
+            if (HasComp<PocketDimensionSenderComponent>(entity))
+                return;
+            if (!TryComp<TransformComponent>(entity, out var transform))
+                return;
+            var dweller = AddComp<PocketDimensionDwellerComponent>(entity);
+            dweller.dimensionOwner = owner;
+            var puddle = Comp<CorrosivePuddleComponent>(SpawnAttachedTo(comp.PocketPuddle, transform.Coordinates));
+            puddle.shouldDecay = true;
             _xformSystem.SetCoordinates(entity, new EntityCoordinates(comp.pocketDimensionGrid.Value, Vector2.Zero));
+            EntityManager.EventBus.RaiseComponentEvent<EnterPocketDimension>(entity, dweller, new EnterPocketDimension());
         }
     }
 
     private void OnTogglePocketDimeison(EntityUid owner, PocketDimensionSenderComponent comp, TogglePocketDimensionDoAfter args)
     {
-        if (!_oldMan.GetTraverseComponent(owner, out var traverse))
+        if(!_oldMan.GetTraverseComponent(owner, out var traverse))
             return;
+
         if (args.Cancelled)
-        {
-            _actions.SetCooldown(traverse.actionId, traverse.cooldownFail);
             return;
-        }
 
         if (comp.pocketDimensionGrid == null)
             return;
 
-        _actions.SetCooldown(traverse.actionId, traverse.cooldownSuccess);
+        if (!_mind.TryGetMind(owner, out var _, out var mind))
+            return;
+        if (mind.Session == null)
+            return;
+
+        _audio.PlayGlobal(comp.puddleSound, mind.Session);
 
         if (comp.inPocketDimension)
-        { 
+        {
+            if(TryComp<CorrosivePuddleComponent>(comp.movePuddleEntity,out var puddle))
+            {
+                puddle.decayTimer = TimeSpan.FromSeconds(3f);
+                puddle.shouldDecay = true;
+            }
+            _actions.SetCooldown(traverse.actionId, traverse.cooldownExit);
             _xformSystem.SetCoordinates(owner, comp.lastLocation);
         }
         else
         {
             if (!TryComp<TransformComponent>(owner, out var mover))
                 return;
+            comp.movePuddleEntity = SpawnAttachedTo(comp.PocketPuddle, mover.Coordinates);
+            _actions.SetCooldown(traverse.actionId, traverse.cooldownEnter);
             comp.lastLocation = mover.Coordinates;
             _xformSystem.SetCoordinates(owner, new EntityCoordinates(comp.pocketDimensionGrid.Value, Vector2.Zero));
         }

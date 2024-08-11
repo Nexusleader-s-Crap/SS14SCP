@@ -9,5 +9,5 @@
       sprite: Interface/Actions/actions_borg.rsi
       state: state-laws
     event: !type:TogglePocketDimension
-    useDelay: 2
+    useDelay: 3
   - type: TraversePocketDimensionAction
