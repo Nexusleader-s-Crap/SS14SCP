@@ -1,7 +1,7 @@
 - type: entity
-  id: ActionEnterPocket
-  name: Enter Pocket Dimension
-  description: Enter your pocket dimension
+  id: ActionTraversePocketDimension
+  name: Traverse Pocket Dimension
+  description: Traverse your pocket dimension
   components:
   - type: InstantAction
     itemIconStyle: NoItem
@@ -9,17 +9,4 @@
       sprite: Interface/Actions/actions_borg.rsi
       state: state-laws
     event: !type:TogglePocketDimension
-    useDelay: 0.5
-
-- type: entity
-  id: ActionExitPocket
-  name: Exit Pocket Dimension
-  description: Exit your pocket dimension
-  components:
-  - type: InstantAction
-    itemIconStyle: NoItem
-    icon:
-      sprite: Interface/Actions/actions_borg.rsi
-      state: state-laws
-    event: !type:TogglePocketDimension
-    useDelay: 0.5
+    useDelay: 2

@@ -5,25 +5,20 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server._SCP.Scps.oldman.Components;
 
-[RegisterComponent]
-[Access(typeof(PocketDimensionSystem))]
+[RegisterComponent,NetworkedComponent]
+[AutoGenerateComponentState]
 public sealed partial class PocketDimensionSenderComponent : Component
 {
     public EntityUid? pocketDimensionGrid;
     public EntityUid pocketDimensionMap;
-    public bool inPocketDimension = false;
     public EntityCoordinates lastLocation;
 
-    public EntityUid? pocketDimensionAction;
+    [AutoNetworkedField]
+    public bool inPocketDimension = false;
+
+    [AutoNetworkedField]
+    public bool traversing = false;
 
     [DataField]
-    public EntProtoId enterPocketAction = "ActionEnterPocket";
-
-    [DataField]
-    public EntProtoId exitPocketAction = "ActionExitPocket";
-}
-
-public sealed partial class TogglePocketDimension : InstantActionEvent
-{
-
+    public EntProtoId traversePocketAction = "ActionTraversePocketDimension";
 }

@@ -1,0 +1,1 @@
+scp-oldman-traversepocket = The Old Man begins to descend into the floor.
