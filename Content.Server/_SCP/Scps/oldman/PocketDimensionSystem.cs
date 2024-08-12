@@ -219,9 +219,9 @@ public sealed class PocketDimensionSystem : EntitySystem
 
     private void OnShutdown(EntityUid owner, PocketDimensionSenderComponent comp, ComponentShutdown args)
     {
-        if (comp.pocketDimensionGrid == null)
+        if (comp.pocketDimensionGrid == null||!comp.pocketDimensionGrid.Value.Valid)
             return;
-        _mapManager.DeleteGrid(comp.pocketDimensionGrid.Value);
+        QueueDel(comp.pocketDimensionGrid.Value);
         _mapManager.DeleteMap(Comp<MapComponent>(comp.pocketDimensionMap).MapId);
     }
 
