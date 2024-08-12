@@ -10,10 +10,6 @@
     {
       "name": "alive",
       "directions": 4
-    },
-    {
-      "name": "oldmanicon",
-      "directions": 4
     }
   ]
 }
