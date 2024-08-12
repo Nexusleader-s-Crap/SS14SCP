@@ -4,8 +4,6 @@
   joinNotifyCrew: false
   icon: "TFDJobIconSCP"
   supervisors: nobody
-  hasIcon: true
-  hidden: true
   playTimeTracker: TFDJobSCP106
 
 - type: playTimeTracker
