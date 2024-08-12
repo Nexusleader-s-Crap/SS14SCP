@@ -1,4 +1,4 @@
-using Content.Server._SCP.Scps.oldman.Components;
+using Content.Shared._SCP.Scps.Oldman.Components;
 using Content.Shared.Actions;
 using Content.Shared.Alert;
 using Content.Shared.Coordinates;
