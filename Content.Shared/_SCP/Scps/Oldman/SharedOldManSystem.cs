@@ -19,6 +19,7 @@ using Robust.Shared.Player;
 using System.Numerics;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Content.Shared._SCP.Scps.Oldman;
 
@@ -37,11 +38,16 @@ public sealed class SharedOldManSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _state = default!;
     public override void Initialize()
     {
-        SubscribeLocalEvent<PocketDimensionSenderComponent, TogglePocketDimension>(OnTogglePocket);
         SubscribeLocalEvent<PocketDimensionSenderComponent, ComponentStartup>(OnStartComponent);
+
+        SubscribeLocalEvent<PocketDimensionSenderComponent, TogglePocketDimension>(OnTogglePocket);
+        SubscribeLocalEvent<PocketDimensionSenderComponent, CreateTeleportNodeEvent>(OnCreateNode);
+        SubscribeLocalEvent<PocketDimensionSenderComponent, TraverseTeleportNodeEvent>(OnTraverseNode);
+
         SubscribeLocalEvent<PocketDimensionDwellerComponent, EnterPocketDimension>(OnEnter);
     }
 
+    #region startup
     public void OnEnter(EntityUid owner, PocketDimensionDwellerComponent comp, EnterPocketDimension args)
     {
         if (!TryComp<PocketDimensionSenderComponent>(comp.dimensionOwner, out var pocket))
@@ -57,9 +63,13 @@ public sealed class SharedOldManSystem : EntitySystem
     public void OnStartComponent(EntityUid owner, PocketDimensionSenderComponent comp, ComponentStartup args)
     {
         _actions.AddAction(owner, comp.traversePocketAction);
+        _actions.AddAction(owner, comp.createNodeAction);
         EntityManager.EventBus.RaiseComponentEvent<OldManSpawn>(owner, comp,new OldManSpawn());
     }
 
+    #endregion
+
+    #region actions
     public void OnTogglePocket(EntityUid owner, PocketDimensionSenderComponent pocket, TogglePocketDimension args)
     {
         if (args.Handled)
@@ -76,21 +86,68 @@ public sealed class SharedOldManSystem : EntitySystem
         };
         if (_doAfter.TryStartDoAfter(doAfterArgs))
             _popup.PopupPredicted(Loc.GetString(popup), args.Performer, args.Performer, PopupType.LargeCaution);
-
     }
 
-    public bool GetTraverseComponent(EntityUid uid, out TraversePocketDimensionActionComponent comp)
+    public void OnCreateNode(EntityUid owner, PocketDimensionSenderComponent pocket, CreateTeleportNodeEvent args)
+    {
+        if (args.Handled)
+            return;
+        args.Handled = true;
+
+        if (pocket.inPocketDimension)
+        {
+            _popup.PopupClient(Loc.GetString("scp-oldman-node-inpocket"), args.Performer, args.Performer, PopupType.MediumCaution);
+            return;
+        }
+
+        var ev = new CreateTeleportNodeDoAfterEvent();
+        var popup = "scp-oldman-createnode";
+
+        var doAfterArgs = new DoAfterArgs(EntityManager, args.Performer, TimeSpan.FromSeconds(3f), ev, args.Performer)
+        {
+            BreakOnMove = true,
+        };
+        if (_doAfter.TryStartDoAfter(doAfterArgs))
+            _popup.PopupClient(Loc.GetString(popup), args.Performer, args.Performer, PopupType.Medium);
+    }
+
+    public void OnTraverseNode(EntityUid owner, PocketDimensionSenderComponent pocket, TraverseTeleportNodeEvent args)
+    {
+        if (args.Handled)
+            return;
+        args.Handled = true;
+
+        if (pocket.inPocketDimension)
+        {
+            _popup.PopupClient(Loc.GetString("scp-oldman-node-inpocket"), args.Performer, args.Performer, PopupType.MediumCaution);
+            return;
+        }
+
+        var ev = new TraverseTeleportNodeDoAfterEvent();
+        var popup = "scp-oldman-traversepocket";
+
+        var doAfterArgs = new DoAfterArgs(EntityManager, args.Performer, TimeSpan.FromSeconds(3f), ev, args.Performer)
+        {
+            BreakOnMove = true,
+        };
+        if (_doAfter.TryStartDoAfter(doAfterArgs))
+            _popup.PopupPredicted(Loc.GetString(popup), args.Performer, args.Performer, PopupType.LargeCaution);
+    }
+    #endregion
+
+    public bool GetAction<T>(EntityUid uid, [NotNullWhen(true)] out T? comp, out EntityUid id) where T : IComponent
     {
         foreach (var item in _actions.GetActions(uid))
         {
-            if (TryComp<TraversePocketDimensionActionComponent>(item.Id, out var traverse))
+            if (TryComp<T>(item.Id, out var traverse))
             {
-                traverse.actionId = item.Id;
+                id = item.Id;
                 comp = traverse;
                 return true;
             }
         }
-        comp = new TraversePocketDimensionActionComponent();
+        comp = default;
+        id = uid;
         return false;
     }
 

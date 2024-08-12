@@ -41,7 +41,12 @@ public sealed class PocketDimensionSystem : EntitySystem
 
         SubscribeLocalEvent<PocketDimensionSenderComponent, OldManSpawn>(OnStartup);
         SubscribeLocalEvent<PocketDimensionSenderComponent, ComponentShutdown>(OnShutdown);
+
         SubscribeLocalEvent<PocketDimensionSenderComponent, TogglePocketDimensionDoAfter>(OnTogglePocketDimeison);
+        SubscribeLocalEvent<PocketDimensionSenderComponent, CreateTeleportNodeDoAfterEvent>(OnCreateNode);
+        SubscribeLocalEvent<PocketDimensionSenderComponent, DestroyTeleportNodeEvent>(OnDestroyNode);
+        SubscribeLocalEvent<PocketDimensionSenderComponent, TraverseTeleportNodeDoAfterEvent>(OnTraverseNode);
+
         SubscribeLocalEvent<PocketDimensionDwellerComponent, MobStateChangedEvent>(OnStateChange);
     }
 
@@ -73,7 +78,7 @@ public sealed class PocketDimensionSystem : EntitySystem
                 return;
             var dweller = AddComp<PocketDimensionDwellerComponent>(entity);
             dweller.dimensionOwner = owner;
-            var puddle = Comp<CorrosivePuddleComponent>(SpawnAttachedTo(comp.PocketPuddle, transform.Coordinates));
+            var puddle = Comp<CorrosivePuddleComponent>(SpawnAtPosition(comp.PocketPuddle, transform.Coordinates));
             puddle.shouldDecay = true;
             _xformSystem.SetCoordinates(entity, new EntityCoordinates(comp.pocketDimensionGrid.Value, Vector2.Zero));
             EntityManager.EventBus.RaiseComponentEvent<EnterPocketDimension>(entity, dweller, new EnterPocketDimension());
@@ -82,7 +87,7 @@ public sealed class PocketDimensionSystem : EntitySystem
 
     private void OnTogglePocketDimeison(EntityUid owner, PocketDimensionSenderComponent comp, TogglePocketDimensionDoAfter args)
     {
-        if(!_oldMan.GetTraverseComponent(owner, out var traverse))
+        if(!_oldMan.GetAction<TraversePocketDimensionActionComponent>(owner, out var traverse, out var traverseId))
             return;
 
         if (args.Cancelled)
@@ -105,19 +110,94 @@ public sealed class PocketDimensionSystem : EntitySystem
                 puddle.decayTimer = TimeSpan.FromSeconds(3f);
                 puddle.shouldDecay = true;
             }
-            _actions.SetCooldown(traverse.actionId, traverse.cooldownExit);
+            _actions.SetCooldown(traverseId, traverse.cooldownExit);
             _xformSystem.SetCoordinates(owner, comp.lastLocation);
         }
         else
         {
             if (!TryComp<TransformComponent>(owner, out var mover))
                 return;
-            comp.movePuddleEntity = SpawnAttachedTo(comp.PocketPuddle, mover.Coordinates);
-            _actions.SetCooldown(traverse.actionId, traverse.cooldownEnter);
+            comp.movePuddleEntity = SpawnAtPosition(comp.PocketPuddle, mover.Coordinates);
+            _actions.SetCooldown(traverseId, traverse.cooldownEnter);
             comp.lastLocation = mover.Coordinates;
             _xformSystem.SetCoordinates(owner, new EntityCoordinates(comp.pocketDimensionGrid.Value, Vector2.Zero));
         }
         comp.inPocketDimension = !comp.inPocketDimension;
+    }
+
+    private void OnCreateNode(EntityUid owner, PocketDimensionSenderComponent comp, CreateTeleportNodeDoAfterEvent args)
+    {
+        if (args.Cancelled||args.Handled)
+            return;
+
+        if (!_oldMan.GetAction<CreateTeleportNodeComponent>(owner, out var node, out var nodeId))
+            return;
+
+        if (!TryComp<TransformComponent>(owner, out var mover))
+            return;
+
+        _actions.SetCooldown(nodeId, node.cooldown);
+
+        if (comp.teleportNode == null)
+        {
+            comp.teleportNode = SpawnAtPosition(comp.PocketPuddle, mover.Coordinates);
+        }
+        else
+        {
+            _xformSystem.SetCoordinates(comp.teleportNode.Value, mover.Coordinates);
+        }
+
+        comp.nodeLocation = mover.Coordinates;
+
+        if (!_oldMan.GetAction<DestroyTeleportNodeComponent>(owner, out var _, out var _))
+            _actions.AddAction(owner, comp.destroyNodeAction);
+        if (!_oldMan.GetAction<TraverseTeleportNodeComponent>(owner, out var _, out var _))
+            _actions.AddAction(owner, comp.traverseNodeAction);
+    }
+
+    public void OnDestroyNode(EntityUid owner, PocketDimensionSenderComponent comp, DestroyTeleportNodeEvent args)
+    {
+        if (comp.teleportNode == null)
+            return;
+
+        if (!TryComp<CorrosivePuddleComponent>(comp.teleportNode, out var puddle))
+            return;
+        comp.teleportNode = null;
+        puddle.shouldDecay = true;
+
+        if (_oldMan.GetAction<CreateTeleportNodeComponent>(owner, out var createcomp, out var create))
+            _actions.SetCooldown(owner, createcomp.destroyCooldown);
+
+        if (_oldMan.GetAction<DestroyTeleportNodeComponent>(owner, out var _, out var destroy))
+            _actions.RemoveAction(destroy);
+        if (_oldMan.GetAction<TraverseTeleportNodeComponent>(owner, out var _, out var traverse))
+            _actions.RemoveAction(traverse);
+    }
+
+    public void OnTraverseNode(EntityUid owner, PocketDimensionSenderComponent comp, TraverseTeleportNodeDoAfterEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        if (!_oldMan.GetAction<TraverseTeleportNodeComponent>(owner, out var node, out var nodeId))
+            return;
+
+        if (!TryComp<TransformComponent>(owner, out var mover))
+            return;
+
+        if (comp.teleportNode == null)
+            return;
+
+        _actions.SetCooldown(nodeId, node.teleportCooldown);
+
+        _xformSystem.SetCoordinates(owner, comp.nodeLocation);
+
+        if (!_mind.TryGetMind(owner, out var _, out var mind))
+            return;
+        if (mind.Session == null)
+            return;
+
+        _audio.PlayGlobal(comp.puddleSound, mind.Session);
     }
 
     private void OnStartup(EntityUid owner, PocketDimensionSenderComponent comp, OldManSpawn args)

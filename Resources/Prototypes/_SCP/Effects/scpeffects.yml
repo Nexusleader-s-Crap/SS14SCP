@@ -3,7 +3,6 @@
   name: corrosive puddle
   description: Puddle of corrosive acid, maybe you shouldnt stick around too long
   components:
-  - type: Transform
   - type: Sprite
     sprite: _SCP/Effects/oldmanpuddle.rsi
     drawdepth: FloorTiles
