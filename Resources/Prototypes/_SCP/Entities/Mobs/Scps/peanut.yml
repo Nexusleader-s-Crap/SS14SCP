@@ -1,0 +1,33 @@
+- type: entity
+  parent: TFDPlayableSCP
+  id: TFDSCP173
+  name: SCP-173
+  description: scp 173
+  components:
+  - type: MovementSpeedModifier
+    baseWalkSpeed : 1.5
+    baseSprintSpeed : 3.5
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.3
+        density: 230
+        mask:
+        - MobMask
+        layer:
+        - MobMask
+  - type: ScpPeanut
+  - type: TriggerOnProximity
+    enabled: true
+    cooldown: 5
+    shape:
+      !type:PhysShapeCircle
+        radius: 20
+  repeating: true
+  - type: Sprite
+    sprite: _SCP/Mobs/Scps/oldman.rsi
+    layers:
+    - map: ["enum.DamageStateVisualLayers.Base"]
+      state: alive
