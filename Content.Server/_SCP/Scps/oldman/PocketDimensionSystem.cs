@@ -40,6 +40,7 @@ public sealed class PocketDimensionSystem : EntitySystem
         SubscribeLocalEvent<PocketDimensionSenderComponent, MeleeHitEvent>(OnSend);
 
         SubscribeLocalEvent<PocketDimensionSenderComponent, OldManSpawn>(OnStartup);
+        SubscribeLocalEvent<CorrosivePuddleComponent, ComponentStartup>(OnPuddleStart);
         SubscribeLocalEvent<PocketDimensionSenderComponent, ComponentShutdown>(OnShutdown);
 
         SubscribeLocalEvent<PocketDimensionSenderComponent, TogglePocketDimensionDoAfter>(OnTogglePocketDimeison);
@@ -48,6 +49,13 @@ public sealed class PocketDimensionSystem : EntitySystem
         SubscribeLocalEvent<PocketDimensionSenderComponent, TraverseTeleportNodeDoAfterEvent>(OnTraverseNode);
 
         SubscribeLocalEvent<PocketDimensionDwellerComponent, MobStateChangedEvent>(OnStateChange);
+    }
+
+    public void OnPuddleStart(EntityUid owner, CorrosivePuddleComponent comp, ComponentStartup args)
+    {
+        if (!TryComp<TransformComponent>(owner, out var transform))
+            return;
+        transform.LocalRotation = Angle.Zero;
     }
 
     public void OnStateChange(EntityUid owner, PocketDimensionDwellerComponent comp, MobStateChangedEvent args)

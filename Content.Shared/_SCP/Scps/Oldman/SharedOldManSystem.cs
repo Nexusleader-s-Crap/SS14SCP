@@ -20,6 +20,7 @@ using System.Numerics;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using System.Diagnostics.CodeAnalysis;
+using Robust.Shared.Physics;
 
 namespace Content.Shared._SCP.Scps.Oldman;
 
