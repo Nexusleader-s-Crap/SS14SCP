@@ -230,7 +230,8 @@ public sealed class PocketDimensionSystem : EntitySystem
         if (comp.pocketDimensionGrid == null||!comp.pocketDimensionGrid.Value.Valid)
             return;
         QueueDel(comp.pocketDimensionGrid.Value);
-        _mapManager.DeleteMap(Comp<MapComponent>(comp.pocketDimensionMap).MapId);
+        if (TryComp<MapComponent>(comp.pocketDimensionMap, out var map))
+            _mapManager.DeleteMap(map.MapId);
     }
 
 }
