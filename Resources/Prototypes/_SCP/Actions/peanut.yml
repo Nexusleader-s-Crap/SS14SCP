@@ -1,0 +1,15 @@
+- type: entity
+  id: ActionPeanutTeleport
+  name: Teleport
+  description: Teleport foward when the mortals blink
+  components:
+  - type: WorldTargetAction
+    itemIconStyle: NoItem
+    icon:
+      sprite: _SCP/Interface/Actions/oldman.rsi
+      state: traversepocket
+    event: !type:PeanutTeleportEvent
+    deselectOnMiss: false
+    range: 40
+    useDelay: 5
+  - type: PeanutTeleportAction
