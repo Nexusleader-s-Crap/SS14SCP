@@ -5,8 +5,8 @@
   description: scp 173
   components:
   - type: MovementSpeedModifier
-    baseWalkSpeed : 1.5
-    baseSprintSpeed : 3.5
+    baseWalkSpeed : 10
+    baseSprintSpeed : 15
   - type: Fixtures
     fixtures:
       fix1:
@@ -19,15 +19,47 @@
         layer:
         - MobMask
   - type: ScpPeanut
+  - type: MeleeWeapon
+    hidden: true
+    soundHit:
+      collection: MetalThud
+    damage:
+      groups:
+        Brute: 500
   - type: TriggerOnProximity
+    requiresAnchored: false
     enabled: true
-    cooldown: 5
+    cooldown: 1
     shape:
       !type:PhysShapeCircle
-        radius: 20
+        radius: 5
     repeating: true
   - type: Sprite
     sprite: _SCP/Mobs/Scps/oldman.rsi
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: alive
+
+- type: entity
+  parent: [ TFDSCP173 ]
+  id: TFDSCP173AI
+  name: SCP-173 (AI)
+  components:
+  - type: HTN
+    rootTask:
+      task: SimpleHostileCompound
+    blackboard:
+      NavClimb: !type:Bool
+        true
+      NavSmash: !type:Bool
+        true
+  - type: NpcFactionMember
+    factions:
+    - SimpleHostile
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - FootstepSound
+  - type: MovementAlwaysTouching
+  - type: ReplacementAccent
+    accent: genericAggressive

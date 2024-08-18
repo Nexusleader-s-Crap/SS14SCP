@@ -136,7 +136,7 @@ public sealed class SharedOldManSystem : EntitySystem
     }
     #endregion
 
-    public bool GetAction<T>(EntityUid uid, [NotNullWhen(true)] out T? comp, out EntityUid id) where T : IComponent
+    public bool GetAction<T>(EntityUid uid, [NotNullWhen(true)] out T? comp, out EntityUid id) where T : IComponent //Move this to sharedactionfetchsystem
     {
         foreach (var item in _actions.GetActions(uid))
         {
