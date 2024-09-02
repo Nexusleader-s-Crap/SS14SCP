@@ -8,39 +8,11 @@
     makeSentient: true
     allowSpeech: true
     allowMovement: true
-    name: ghost-role-information-TFDSCP999-name
-    description: ghost-role-information-TFDSCP999-description
-    rules: ghost-role-information-nonantagonist-rules
   - type: GhostTakeoverAvailable
   - type: Speech
   - type: MovementSpeedModifier
     baseWalkSpeed : 3.5
     baseSprintSpeed : 4.5
-  - type: Food
-  - type: Thirst
-    startingThirst: 25  
-    thresholds:
-      OverHydrated: 35
-      Okay: 25
-      Thirsty: 15
-      Parched: 10
-    baseDecayRate: 1
-  - type: Hunger
-    currentHunger: 25   
-    thresholds:
-      Overfed: 35
-      Okay: 25
-      Peckish: 15
-      Starving: 10
-    baseDecayRate: 2
-  - type: Extractable
-    grindableSolutionName: food
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        reagents:
-        - ReagentId: UncookedAnimalProteins
-          Quantity: 3
   - type: Fixtures
     fixtures:
       fix1:
@@ -54,6 +26,3 @@
         - SmallMobLayer
   - type: Sprite
     sprite: _SCP/Mobs/Scps/ticklemonster.rsi
-    layers:
-    - map: ["enum.DamageStateVisualLayers.Base"]
-      state: Ticklemonster
