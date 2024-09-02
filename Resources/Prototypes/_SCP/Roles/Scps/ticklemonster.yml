@@ -1,0 +1,10 @@
+- type: job
+  id: TFDSCP999
+  description: null
+  joinNotifyCrew: false
+  icon: "TFDJobIconSCP"
+  supervisors: nobody
+  playTimeTracker: TFDJobSCP999
+
+- type: playTimeTracker
+  id: TFDJobSCP999
