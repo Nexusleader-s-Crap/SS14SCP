@@ -13,9 +13,6 @@
     rules: ghost-role-information-nonantagonist-rules
   - type: GhostTakeoverAvailable
   - type: Speech
-    speechVerb: SmallMob
-    speechSounds: Squish
-    allowedEmotes: ['Squish']
   - type: MovementSpeedModifier
     baseWalkSpeed : 3.5
     baseSprintSpeed : 4.5
