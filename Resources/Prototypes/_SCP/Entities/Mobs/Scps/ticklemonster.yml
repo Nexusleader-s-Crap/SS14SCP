@@ -51,4 +51,4 @@
     sprite: _SCP/Mobs/Scps/ticklemonster.rsi
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
-      state: alive
+      state: Ticklemonster
