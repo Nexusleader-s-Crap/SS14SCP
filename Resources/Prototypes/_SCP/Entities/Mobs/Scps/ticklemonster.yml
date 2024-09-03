@@ -1,5 +1,5 @@
 - type: entity
-  name: SCP-99
+  name: SCP-999
   parent: [SimpleMobBase, StripableInventoryBase]
   id: SCP999
   description: goopy!
