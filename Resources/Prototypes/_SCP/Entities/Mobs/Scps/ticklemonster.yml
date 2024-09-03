@@ -1,28 +1,45 @@
 - type: entity
-  parent: TFDPlayableSCP
-  id: TFDSCP999
   name: SCP-999
-  description: a large, amorphous, gelatinous mass of translucent orange slime, weighing about 54 kg (120 lbs) with a consistency similar to that of peanut butter.
+  parent: [SimpleMobBase, StripableInventoryBase]
+  id: MobWeasel
+  description: goopy!
   components:
-  - type: GhostRole
-    makeSentient: true
-    allowSpeech: true
-    allowMovement: true
-  - type: GhostTakeoverAvailable
-  - type: Speech
-  - type: MovementSpeedModifier
-    baseWalkSpeed : 3.5
-    baseSprintSpeed : 4.5
+  - type: Sprite
+    drawdepth: Mobs
+    sprite: _SCP/Mobs/scps/ticklemonster.rsi
+    layers:
+    - map: ["enum.DamageStateVisualLayers.Base"]
+      state: Ticklemonster
+  - type: Physics
   - type: Fixtures
     fixtures:
       fix1:
         shape:
           !type:PhysShapeCircle
           radius: 0.6
-        density: 125
+        density: 120
         mask:
-        - SmallMobMask
+        - MobMask
         layer:
-        - SmallMobLayer
-  - type: Sprite
-    sprite: _SCP/Mobs/Scps/ticklemonster.rsi
+        - MobLayer
+  - type: Inventory
+    speciesId: TFDPlayableSCP
+    templateId: pet
+  - type: DamageStateVisuals
+    states:
+      Alive:
+        Base: Ticklemonster
+  - type: InteractionPopup
+    successChance: 0.8
+    interactDelay: 1.5 
+    interactSuccessString: petting-success-soft-floofy
+    interactFailureString: petting-failure-generic
+    interactSuccessSpawn: EffectHearts
+    interactSuccessSound:
+      path: /Audio/Animals/ferret_happy.ogg
+  - type: Grammar
+    attributes:
+      gender: epicene
+  - type: Tag
+    tags:
+    - VimPilot
